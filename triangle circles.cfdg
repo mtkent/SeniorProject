@@ -1,0 +1,13 @@
+startshape blah
+CF::Background = [hue -4530 sat 1 b -0.119 ]
+CF::MinimumSize =  0.124
+shape blah {
+blah2 [alpha -1]
+blah2 [ flip 235 alpha -1 x 5 b 1]
+blah2 [alpha - 6 y -5 b 1]
+blah2 [flip  235 alpha -1 x 5 y -5]
+}
+shape blah2 {
+ TRIANGLE []
+blah2 [alpha 0.01  r  32.94 ..10 x 1 s 0.995 ]
+}
