@@ -3,6 +3,6 @@
 	CF::Background = [hue 120 sat 1 b -0.5]
 	CF::MinimumSize = 0.1
 	shape start {
-	TRIANGLE [x 2 b 0.5]
+	TRIANGLE [skew 2 30 b 0.5]
 	}
 	

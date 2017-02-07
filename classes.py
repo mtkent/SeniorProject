@@ -96,11 +96,11 @@ class Multiply(Operator):
 class Divide(Operator):
 	opsStr = "/"
 
-test = Triangle(Skew(2, 30), Brightness(.5)) 
-print (str(test))
+parent1 = Triangle(Skew(20, 30), Brightness(.5)) 
+print (str(parent1))
 
-test2 = Square(Transform(2, 30), Flip(.5))
-print (str(test2))
+parent2 = Square(Transform(45, 100), Flip(5))
+print (str(parent2))
 
 def templateBuild(object):
 	return """
@@ -123,13 +123,35 @@ def createImage(code):
 
 r = random.uniform(0, 50)
 
-name = test
 
-if (r > 25):
-	name = test2 
+list1 = str(parent1).split()
+list2 = str(parent2).split()
+# list5 = list1
 
+# for index, item in enumerate(list2):
+# 	print(index, item)
+# 	print(list5[index])
+# 	list5[index] = list2[index]
 
-createImage(templateBuild(name))
+# child2 = ' '.join(word for word in list5)
+
+# print("here", child2)
+
+# if have two of same size, will do crossover
+def swap(l1, l2):
+	l3 = l1
+
+	for index,item in enumerate(l2):
+		ran = random.uniform(0, 5)
+		if (ran >= 4):
+			l3[index] = l2[index]
+
+	return l3
+
+temp = swap(list1, list2)
+child = ' '.join(word for word in temp)
+
+createImage(templateBuild(child))
 
 # def createImage2(code):
 # 	if (not os.path.exists("output")):
@@ -142,9 +164,8 @@ createImage(templateBuild(name))
 
 # createImage2(templateBuild(test2))
 
-print(str(templateBuild(test)))
+print(str(templateBuild(child)))
 
-print(str(templateBuild(test2)))
 
 
 # will randomly pick left or right first, set left to current
