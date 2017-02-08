@@ -26,6 +26,9 @@ class Circle(Shape):
 class Triangle(Shape):
 	name = "TRIANGLE"
 
+class Blah2(Shape):
+	name = "blah2"
+
 
 class Modifier:
 	def __str__(self):
@@ -96,12 +99,58 @@ class Multiply(Operator):
 class Divide(Operator):
 	opsStr = "/"
 
-parent1 = Triangle(Skew(20, 30), Brightness(.5)) 
+parent1 = Triangle(Skew(20, 30), Brightness(.5) ) #, Hue(41312), Y(100)) 
+# parent1 = Square() Blah2(Skew(20, 30), Rotate(93.18 .10), X(14), Saturation(0.9992))
 print (str(parent1))
 
-parent2 = Square(Transform(45, 100), Flip(5))
+parent2 = Square(Transform(45, 100), Flip(5)) #, Alpha(3), Saturation(44))
+# TRIANGLE() blah2 [Transform(45, 100), X(3.18 101), Y(31), Brightness(0.5) ] 
 print (str(parent2))
 
+
+list1 = str(parent1).split()
+list2 = str(parent2).split()
+
+# if have two of same size, will do crossover
+def swap(l1, l2):
+	l3 = list(l1)
+
+	for index,item in enumerate(l2):
+		ran = random.uniform(0, 100)
+		if (ran > 50):
+			l3[index] = l2[index]
+		else:
+			l3[index] = l1[index]
+	return l3
+
+
+children = [None] * 100
+
+# will create a number of children 
+def reproduce(arr, par1, par2):
+	for i in range(100):
+		temp = swap(par1, par2)
+		child = ' '.join(word for word in temp)
+		arr[i] = child;
+
+reproduce(children, list1, list2)
+
+# will choose two from previous generation, will repopulate chilren list with next generation - will do this a set number of times
+def breed():
+	for _ in range(100):
+		# picks new parent1
+		ran = random.uniform(0,99)
+		list3 = str(children[int(ran)]).split() 
+		# picks new parent2, making sure is not same one
+		rand = random.uniform(0,99)
+		if (ran == rand):
+			if (rand < 99):
+				rand = rand + 1
+		list4 = str(children[int(rand)]).split()
+		reproduce(children, list3, list4)
+
+
+# PROBLEM: how to make more complicated?
 def templateBuild(object):
 	return """
 	startshape start
@@ -112,6 +161,23 @@ def templateBuild(object):
 	}}
 	""".format(str(object))
 
+	# return """
+	# startshape blah
+	# CF::Background = [hue 199 sat 1 b -0.435 ]
+	# CF::MinimumSize =  0.186
+	# shape blah {
+	# blah2 [alpha -1]
+	# blah2 [ flip 65 alpha -1 x 5 b 1]
+	# blah2 [alpha - 2 y -5 b 1]
+	# blah2 [flip 90 alpha -1 x 5 y -5]
+	# }
+	# shape blah2 {{
+	# {}
+	# }}
+
+	# """.format(str(object))
+
+
 def createImage(code):
 	if (not os.path.exists("output")):
 		os.mkdir("output")
@@ -121,37 +187,12 @@ def createImage(code):
 
 	subprocess.run(["ContextFree/ContextFreeCLI.exe", "output/code.cfdg", "output/result.png"])
 
-r = random.uniform(0, 50)
 
 
-list1 = str(parent1).split()
-list2 = str(parent2).split()
-# list5 = list1
+breed();
+createImage(templateBuild(children[0]))
 
-# for index, item in enumerate(list2):
-# 	print(index, item)
-# 	print(list5[index])
-# 	list5[index] = list2[index]
-
-# child2 = ' '.join(word for word in list5)
-
-# print("here", child2)
-
-# if have two of same size, will do crossover
-def swap(l1, l2):
-	l3 = l1
-
-	for index,item in enumerate(l2):
-		ran = random.uniform(0, 5)
-		if (ran >= 4):
-			l3[index] = l2[index]
-
-	return l3
-
-temp = swap(list1, list2)
-child = ' '.join(word for word in temp)
-
-createImage(templateBuild(child))
+print(str(templateBuild(children[0])))
 
 # def createImage2(code):
 # 	if (not os.path.exists("output")):
@@ -164,11 +205,8 @@ createImage(templateBuild(child))
 
 # createImage2(templateBuild(test2))
 
-print(str(templateBuild(child)))
-
-
-
 # will randomly pick left or right first, set left to current
+
 # def crossover(left, right):
 # 50 percent return copy of left (new node that is equivilant, except with crossover function applied to each child)
 # if type(left) (use is instance?) = node - check if node, not a number 
@@ -187,16 +225,3 @@ print(str(templateBuild(child)))
 # class Number, variable - name that is a string, want without quotes 
 # repr of a string adds quotes
 # class parameter also 
-
-
-
-
-# Made new modifiers, of different types - good idea? - something off about the number of args?
-# Want to be able to use in program - how?
-
-# crossover: if modifiers have same type, can interchange. Shapes can also switch. 
-# can use mutation for numbers. 
-# will want to be able to crossover body of shape 
-
-
-# shape definition will be tricky with the types 
