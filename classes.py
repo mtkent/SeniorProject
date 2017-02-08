@@ -114,7 +114,6 @@ list2 = str(parent2).split()
 # if have two of same size, will do crossover
 def swap(l1, l2):
 	l3 = list(l1)
-
 	for index,item in enumerate(l2):
 		ran = random.uniform(0, 100)
 		if (ran > 50):
@@ -123,6 +122,29 @@ def swap(l1, l2):
 			l3[index] = l1[index]
 	return l3
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+        
+def mutate(list):
+	for index, item in enumerate(list):
+		if (is_number(item)):
+			ran = random.uniform(0, 100)
+			if (ran > 85):
+				rand = random.uniform(0, 100)
+				if (rand > 50):
+					temp = float(item) * 1.05
+					list[index] = str(temp)
+				else:
+					temp = float(item) * .95
+					list[index] = str(temp)
+	# still doesn't edit last one
+
+	return list
+
 
 children = [None] * 100
 
@@ -130,6 +152,7 @@ children = [None] * 100
 def reproduce(arr, par1, par2):
 	for i in range(100):
 		temp = swap(par1, par2)
+		mutate(temp)
 		child = ' '.join(word for word in temp)
 		arr[i] = child;
 
@@ -140,7 +163,7 @@ def breed():
 	for _ in range(100):
 		# picks new parent1
 		ran = random.uniform(0,99)
-		list3 = str(children[int(ran)]).split() 
+		list3 = str(children[int(ran)]).split()
 		# picks new parent2, making sure is not same one
 		rand = random.uniform(0,99)
 		if (ran == rand):
