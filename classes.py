@@ -3,6 +3,38 @@ import random
 import subprocess 
 import os
 
+# unit tests random.seed?
+class Program: # has startshape, which shapeDef, and a dictionary of nodes
+	def __str__(self):
+		return """
+		startshape {startshape}
+		CF::Background = [hue 120 sat 1 b -0.5]
+		CF::MinimumSize = 0.1
+		{shapes}
+		""".format(startshape = self.startshape, shapes = "\n".join(str(self.shapes[k]) for k in self.shapes))
+	def __init__(self, startshape, shapes): # shapes should be dictionary 
+		self.startshape = startshape
+		self.shapes = shapes # add if statment for dictionary
+	def addShape (self, shape):
+		self.shapes[shape.name] = shape
+
+
+# node1 = Node()
+# ShapeDef(self, sq, node1)
+# startshape = dsdlkj
+# shape = 
+# Program(sqare, startshape, shape)
+
+
+# shapedef has name, list of nodes, method that turns to string
+
+class ShapeDef:
+	def __str__(self): #to code method
+		return "shape " + self.name + "{\n" + "\n".join(str(x) for x in self.children) +  " \n } \n"
+	def __init__ (self, name, children):
+		self.name = name
+		self.children = children
+
 class Node:
 	def __str__(self):
 		return "unimplemented"
@@ -80,24 +112,24 @@ class Value:
 	def __init__(self, val):
 		self.val = val
 
-class Operator:
-	def __str__(self):
-		return str(self.lhs) + self.opsStr + str(self.rhs)
-	def __init__(self, lhs, rhs):
-		self.rhs = rhs
-		self.lhs = lhs
+# class Operator:
+# 	def __str__(self):
+# 		return str(self.lhs) + self.opsStr + str(self.rhs)
+# 	def __init__(self, lhs, rhs):
+# 		self.rhs = rhs
+# 		self.lhs = lhs
 
-class Plus(Operator):
-	opsStr = "+"
+# class Plus(Operator):
+# 	opsStr = "+"
 
-class Minus(Operator):
-	opsStr = "-"
+# class Minus(Operator):
+# 	opsStr = "-"
 
-class Multiply(Operator):
-	opsStr = "*"
+# class Multiply(Operator):
+# 	opsStr = "*"
 
-class Divide(Operator):
-	opsStr = "/"
+# class Divide(Operator):
+# 	opsStr = "/"
 
 parent1 = Triangle(Skew(20, 30), Brightness(.5) ) #, Hue(41312), Y(100)) 
 # parent1 = Square() Blah2(Skew(20, 30), Rotate(93.18 .10), X(14), Saturation(0.9992))
@@ -107,13 +139,16 @@ parent2 = Square(Transform(45, 100), Flip(5)) #, Alpha(3), Saturation(44))
 # TRIANGLE() blah2 [Transform(45, 100), X(3.18 101), Y(31), Brightness(0.5) ] 
 print (str(parent2))
 
-
+# prints (45, 100) f5 
+print (parent2.children[0].values, parent2.children[1], len(parent2.children))
+# split the declarations into lists of strings (DOES IT HAVE TO BE A STRING? - yes for split, might need to find another way)
 list1 = str(parent1).split()
 list2 = str(parent2).split()
 
 # if have two of same size, will do crossover
-def swap(l1, l2):
-	l3 = list(l1)
+# will make an empty program 
+def swap(l1, l2):  # want to crossover with objects instead 
+	l3 = list(l1) # should start empty instead 
 	for index,item in enumerate(l2):
 		ran = random.uniform(0, 100)
 		if (ran > 50):
@@ -174,6 +209,7 @@ def breed():
 
 
 # PROBLEM: how to make more complicated?
+# needs to traverse tree, recursively, when comes to shape node, needs to add text?
 def templateBuild(object):
 	return """
 	startshape start
