@@ -1,8 +1,10 @@
+# imports
 import math
 import random
 import subprocess 
 import os
 import copy
+import string
 
 # unit tests random.seed?
 class Program: # has startshape, which shapeDef, and a dictionary of nodes
@@ -19,38 +21,95 @@ class Program: # has startshape, which shapeDef, and a dictionary of nodes
 	def addShape (self, shape):
 		self.shapes[shape.name] = shape
 
+class NonTerminal:
+	def __str__(self):
+		return ("\n".join(str(k) for k in self.children))
+	def __init__ (self, *children, program = None):
+		self.children = children
+		self.program = program
+	def setProgram (p):
+		self.program = p
+		for c in self.children:
+			c.setProgram(p)
+	def __copy__ (self):
+		self.copyHelper({})
+	def copyHelper (self, dictionary):
+		if self in dictionary:
+			return dictionary[self]
+		else:
+			return NonTerminal(*[c.copyHelper(dictionary) for c in self.children], program = None)
 
 class ShapeDef:
 	def __str__(self): #to code method
-		return "shape " + self.name + "{\n" + "\n".join(str(x) for x in self.children) +  " \n } \n"
-	def __init__ (self, name, children):
+		return "rule " + self.name + " " + str(self.weight) + "{\n" + "\n".join(str(x) for x in self.children) +  " \n } \n"
+	def __init__ (self, name, children, weight = 1):
 		self.name = name
 		self.children = children
+		self.weight = weight
+	def setProgram (p):
+		self.program = p
+		for c in self.children:
+			c.setProgram(p)
+	def __copy__ (self):
+		self.copyHelper({})
+	def copyHelper (self, dictionary):
+		if self in dictionary:
+			return dictionary[self]
+		else:
+			return ShapeDef(name, [c.copyHelper(dictionary) for c in self.children], self.weight)
 
 class Node:
 	def __str__(self):
 		return "unimplemented"
 	def __init__(self, *children):
 		self.children = children
-
+	def __copy__ (self):
+		self.copyHelper({})
+	def copyHelper (self, dictionary):
+		if self in dictionary:
+			return dictionary[self]
+		else:
+			return type(self)([c.copyHelper(dictionary) for c in self.children])
+# added copy
 class Shape(Node):
 	def __str__(self):
 		return "{} [{}]".format(self.name, self.argsStr() )
-	def __init__(self, *args):
+	def __init__(self, name, *args):
 		super().__init__(*args)
+		self.name = name
 	def argsStr(self):
 		return " ".join(str(c)for c in self.children)
+	def __copy__ (self):
+		self.copyHelper({})
+	def copyHelper (self, dictionary):
+		if self in dictionary:
+			return dictionary[self]
+		else:
+			return type(self)([c.copyHelper(dictionary) for c in self.children])
 
-class Square(Shape):
+# need to copy?
+class SimpleShape (Shape):
+	def __init__ (self, *args):
+		super().__init__(None, *args)
+		del self.name
+
+class RuleCall (Shape):
+	def __init__(self, rule, *args):
+		super().__init__(rule.name, *args)
+		self.rule = rule
+	def __str__(self):
+		self.name = self.rule.name
+		return super().__str__(self)
+
+# shapes
+class Square(SimpleShape):
 	name = "SQUARE"
 
-class Circle(Shape):
+class Circle(SimpleShape):
 	name = "CIRCLE"
 
-class Triangle(Shape):
+class Triangle(SimpleShape):
 	name = "TRIANGLE"
-
-
 
 class Modifier:
 	def __str__(self):
@@ -58,6 +117,7 @@ class Modifier:
 	def __init__(self, *values):
 		self.values = values
 
+# modifers and value
 # 1
 class Alpha(Modifier):
 	name = "a"
@@ -103,185 +163,150 @@ class Value:
 	def __init__(self, val):
 		self.val = val
 
-
 parent1 = Triangle(Skew(20, 30), Brightness(.5) ) #, Hue(41312), Y(100)) 
-# parent1 = Square() Blah2(Skew(20, 30), Rotate(93.18 .10), X(14), Saturation(0.9992))
-print (str(parent1))
-
 parent2 = Square(Transform(45, 100), Flip(5)) #, Alpha(3), Saturation(44))
-# TRIANGLE() blah2 [Transform(45, 100), X(3.18 101), Y(31), Brightness(0.5) ] 
-print (str(parent2))
 
 # 4 squares 
-parent3 = ShapeDef("testshape", [
-	Square(Transform(-10, -10)), 
-	Square(Transform(10, 10)), 
-	Square(Transform(10, -10)), 
-	Square(Transform(-10, 10)) ])
+parent3 = ShapeDef("newshape", [
+	Square(Transform(-3, -3)), 
+	Square(Transform(3, 3)), 
+	Square(Transform(3, -3)), 
+	Square(Transform(-3, 3)) ])
 
 parent4 = ShapeDef("testshape", [
-	Triangle(Y (20)), 
 	Triangle(Y (10)), 
+	Triangle(Y (5)), 
 	Triangle(Y (0)) ])
 
+parent5 = ShapeDef("newshape", [
+	Circle (X (2), Skew (12, 45), Hue (45), Rotate (33) ), 
+	Square(Transform(3, 3)), 
+	Triangle(Saturation (300), Alpha (43), Transform(4)),
+	Shape(parent4.name, Transform(1, 2)),
+	])
 
-program1 = Program("testshape", [parent4])
+nt3 = NonTerminal(parent3) 
+nt4 = NonTerminal(parent4)
+nt5 = NonTerminal(parent5, parent3)
 
-# prints (45, 100) f5 2
-# print (parent2.children[0].values, parent2.children[1], len(parent2.children))
+program1 = Program("testshape", [nt3])
+program2 = Program("newshape",[nt4])
+program3 = Program("newshape",[nt5, nt4])
 
-# # prints SQUARE
-# print (parent2.name)
-# will print Triangle
-# print(type(s2).__name__)
-# will print true
-# print(s1.__class__ == (Triangle or Square or Circle))
+nt3.setProgram(program1)
+nt4.setProgram(program2)
+nt5.setProgram(program3)
 
-# size tricky since can't be over certain number w/o crashing, so currently not including
-mod1 = [Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform]
-mod2 = [X, Transform, Skew]
-# will look at len(values), if 1, small chance of swapping with random element of mod1, same for 2
+# make a program into something of size 1, with each line taking a certain amount of space
+# program has a name and a list of shapes - startshape and shapes
+# working fairly well, will sometimes drop ones, especially at end?
+def slicechildren (children, numparts):
+	toReturn = [None] * numparts 
+	size = math.ceil(len(children) / numparts)
 
-# type(p1)(newChildren) = ~p3
+	for i in range (0, numparts):
+		ran = random.uniform(0,99)
+		
+		# the lower the number the fewer shapes will go into final program
+		# have higher chance of overlap - good for small programs, but LOTS of repetition, since breeding takes away varience
+		if (ran < 75):
+			size1 = size + 1
+		else: 
+			size1 = size - 1
 
-def shapeCross(p1, p2):
-	likely = 50
-	newChildren = []
-	for i in range(len(p1.children)):
-		rand = random.uniform(0, 100)
-		if (rand > likely):
-			newChildren.append(p1.children[i])	# do I want chance of getting all modifiers?
-		else:
-			newChildren.append(p2.children[i])
-			print(p2.children[i])
+		start = i * size
+		toReturn[i] = children[start: (start + size1)]
+
+	# 	print("start ", start, "end ", start + size1)
+	# print ("returned ", toReturn)
+	return toReturn
+
+def crossSequences (s1, s2):
+	splits = [3, 4, 5, 8, 34]
+
+	numparts = splits[random.randint(0, (len(splits) -1 ))]
 	
-	ran = random.uniform(0, 100)
-	if ran > likely:
-		print("CHILDREN", newChildren)
-		child = (type(p1))(*newChildren)
-	else:
-		print("CHILDREN", newChildren)
+	p1arr = slicechildren(s1, numparts)
+	p2arr = slicechildren(s2, numparts)
 
-		child = (type(p2))(*newChildren)
-
-	# print ("here children", child.children[0][0], child.children[0][1])
-	print ("child ", child)
-	return child
-
-# print ("testing", shapeCross(parent1, parent2).children[0][0].values[0])
-
-
-def shapeDefCross(p1, p2):     # need to find suitable cross 
-	likely = 50
-	newChildren = []
-	for i in range(len(p1.children)):
-		rand = random.uniform(0, 100)
-		if (rand > likely):
-			newChildren.append(p1.children[i])	# do I want chance of getting all modifiers?
+	attributes = []
+	for i in range (0, numparts):
+		ran = random.uniform(0,99)
+		
+		if (ran < 50):
+			attributes.extend(p1arr[i])
 		else:
-			newChildren.append(p2.children[i])
-			print(p2.children[i])
+			attributes.extend(p2arr[i])
+
+	return attributes
+
+	# print("swap", swap)
+
+def flattenProgram (nt):
+	result = []
+
+	for rule in nt:
+		for child in rule.children:
+			if isinstance(child, RuleCall):
+				result.append(child.rule)
+
+	return result
+
+def pickPartner (rule, p1, p2):
+	return 
+
+def crossShapeDef(rule, partner, p1, p2):
+	return
+
+def crossNT (nt1, nt2, p1, p2):
+	rules = crossSequences(nt1.children, nt2.children)
+	result = []
+
 	
-	ran = random.uniform(0, 100)
-	if ran > likely:
-		# print("CHILDREN", newChildren)
-		child = ShapeDef(p1.name, newChildren)
-	else:
-		# print("CHILDREN", newChildren)
+	for rule in rules:
+		partner = pickPartner (rule, p1, p2)
+		result.append[crossShapeDef(rule, partner, p1, p2)]
 
-		child = ShapeDef(p2.name, newChildren)
-
-	# print ("here children", child.children[0][0], child.children[0][1])
-	# print ("child ", child)
-	return child
-
-# print ("testing", shapeCross(parent1, parent2).children[0][0].values[0])
-
-def paramCross(p1, p2, child):
-	likely = 50
-	for i in range (len(child.children[0])):
-		for j in range (len(child.children[0][i].values)):
-			rand = rand = random.uniform(0, 100)
-			# print ("VAL" , p1.children[i].values[j])
-			# if (rand > likely):
-			# 	child.children[0][i].values[j] = p1.children[i].values[j]
-			# else:
-			# 	child.children[0][i].values[j] = p2.children[i].values[j]
-
-	return child
-
-# print ("HERE ERALSKEJRD" , paramCross(parent1, parent2, shapeCross(parent1, parent2)))
+	return flattenProgram(NonTerminal(*result))
 
 
+def scramblenames (program):
+# add unique prefixes to names of program - programs don't have names...
+	newName = program.startshape.name
 
-# print("NEW", shapeCross(parent1, parent2))
-# print (childabc)
+	for i in range (0, 10):
+		ran = random.choice(string.letters)
+		newName = ran + newName
 
-# split the declarations into lists of strings
-list1 = str(parent1).split()
-list2 = str(parent2).split()
+	new = Program(newName, program.shapes)
+	return new
 
-# for shapes 
-# if have two of same size, will do crossover
-# will make an empty program 
-def swap(l1, l2):  # want to crossover with objects instead 
-	l3 = list(l1) # should start empty instead 
-	for index,item in enumerate(l2):
-		ran = random.uniform(0, 100)
-		if (ran > 50):
-			l3[index] = l2[index]
-		else:
-			l3[index] = l1[index]
-	return l3
+# crossover for programs - doesn't take care of shape parameters
+# will need to iterate if more than one shape
+def newprogram (p1, p2):	
+	scrambleNames(p1)
+	scrambleNames(p2)
 
-
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-        
-def mutate(list):
-	for index, item in enumerate(list):
-		if (is_number(item)):
-			ran = random.uniform(0, 100)
-			if (ran > 85):
-				rand = random.uniform(0, 100)
-				if (rand > 50):
-					temp = float(item) * 1.05
-					list[index] = str(temp)
-				else:
-					temp = float(item) * .95
-					list[index] = str(temp)
-	# still doesn't edit last one
-
-	return list
+	result = crossNT(p1.startshape, p2.startshape, p1, p2)
+	return (Program(result[0].name, result))
 
 
-children = [None] * 100
+# breeding and more generations
 
-newchildren = [None] * 100
+programarr = [None] * 100
 
-def newreproduce(arr, p1, p2):
+def programreproduce(arr, prog1, prog2):
 	for i in range(100):
-		child = shapeCross(p1, p2)
+		child = newprogram(prog1, prog2)
 		arr[i] = child
 
-newreproduce(newchildren, parent1, parent2)
 
-# will create a number of children 
-def reproduce(arr, par1, par2):
-	for i in range(100):
-		temp = swap(par1, par2)
-		mutate(temp)
-		child = ' '.join(word for word in temp)
-		arr[i] = child;
-
-reproduce(children, list1, list2)
-
-def newbreed ():
+def programbreed ():
+	# firsthalf = programarr[0:49]
+	# secondhalf = programarr[50:99]
 	for _ in range(100):
+		newarr = []
+		
 		ran = int(random.uniform(0,99))
 		rand = int(random.uniform(0,99))
 		if (ran == rand):
@@ -289,37 +314,18 @@ def newbreed ():
 				rand = rand + 1
 			else:
 				rand = rand - 1
-		p1 = newchildren[ran]
-		p2 = newchildren[rand]
-		newreproduce(newchildren, p1, p2)
+		p1 = programarr[ran]
+		p2 = programarr[rand]
+		# p3 = firsthalf[math.ceil(ran/2)]
+		# p4 = secondhalf[math.ceil(rand/2)]
 
-# will choose two from previous generation, will repopulate chilren list with next generation - will do this a set number of times
-def breed():
-	for _ in range(100):
-		# picks new parent1
-		ran = random.uniform(0,99)
-		list3 = str(children[int(ran)]).split()
-		# picks new parent2, making sure is not same one
-		rand = random.uniform(0,99)
-		if (ran == rand):
-			if (rand < 99):
-				rand = rand + 1
-		list4 = str(children[int(rand)]).split()
-		reproduce(children, list3, list4)
+		# programreproduce(firsthalf, p1, p2)
+		# programreproduce(secondhalf, p3, p4)
 
-
-# PROBLEM: how to make more complicated?
-# needs to traverse tree, recursively, when comes to shape node, needs to add text?
-def templateBuild(object):
-	return """
-	startshape start
-	CF::Background = [hue 120 sat 1 b -0.5]
-	CF::MinimumSize = 0.1
-	shape start {{
-	{}
-	}}
-	""".format(str(object))
-
+		programreproduce(programarr, p1, p2)
+		# newarr.extend(secondhalf)
+		# newarr.extend(secondhalf)
+		# programarr = newarr
 
 def createImage(code):
 	if (not os.path.exists("output")):
@@ -330,16 +336,20 @@ def createImage(code):
 
 	subprocess.run(["ContextFree/ContextFreeCLI.exe", "output/code.cfdg", "output/result.png"])
 
-newShape = shapeDefCross(parent4, parent3)
-program2 = Program(newShape.name, [newShape])
+# aProgram = newprogram(program1, program2)
+# createImage(str(aProgram))
+# print(str(aProgram))
 
-# breed();
-# newbreed();
-# print(str(templateBuild(newchildren[0])))
-createImage(str(program2))
+# programreproduce(programarr, program1, program3)
+# programbreed()
+# createImage(str(programarr[0]))
+# print(str(programarr[0]))
 
-print(str(program2))
 
-# createImage(templateBuild(children[0]))
-# print(str(templateBuild(children[0])))
+# print("program 2: ", str(programarr[1]))
 
+
+# print("new program: ", str(newprogram(program1, program2)))
+print(str(program3))
+
+createImage(str(program3))
