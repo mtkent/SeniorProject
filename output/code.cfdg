@@ -1,8 +1,18 @@
 
-	startshape start
-	CF::Background = [hue 120 sat 1 b -0.5]
-	CF::MinimumSize = 0.1
-	shape start {
-	TRIANGLE [trans 45 100 f 5]
-	}
-	
+		startshape newshape
+		CF::Background = [hue 120 sat 1 b -0.5]
+		CF::MinimumSize = 0.1
+		rule newshape 1{
+CIRCLE [x 2 skew 12 45 h 45 r 33]
+SQUARE [trans 3 3]
+TRIANGLE [sat 300 a 43 trans 4]
+testshape [trans 1 2] 
+ } 
+
+rule testshape 1{
+TRIANGLE [y 10]
+TRIANGLE [y 5]
+TRIANGLE [y 0] 
+ } 
+
+		

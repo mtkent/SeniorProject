@@ -1,0 +1,171 @@
+-------------3/3--------------------
+Need to finish: scramblenames, crossShapeDef, pickPartner, see if copy correct
+
+scramblenames: programs don't have names - can change startshape, but it's not very useful
+crossShapeDef:
+pickPartner: 
+
+
+-------------2/27-------------------
+shapedefcross not changing parameters at all, only shapes
+	solution - array of attributes that it could grab? - would have too many options, probably
+	have chance to swap with random shape 
+
+if breed, lose all code unless add one - then repeat a LOT of the code
+
+-------------2/20-------------------
+Problem1: nesting in new types - doesn't crossover after first 
+Problem2: it knows the parameters but prints them out in a way that CFA can't read.
+Problem3: can't assign to tuples... can either copy for workaround or build from bottom?
+
+Question1: when should mutation occur - after done, or while assigning parameter values
+	Same for mutating modifiers? 
+
+think would want to take a little of each if 
+
+at least two mutation 
+crossoover and then mutate
+
+
+for crossover, never want to drop part of function
+two finger algorithm that will 
+
+
+shapedef: loops, paths } are both children of shapedef 
+
+
+find algorithm for dividing up line - random.choice [1,1,2,2,2,2,3,3,3,3,3,4,4,4,...] this is number of crossover points you have, roll dice from 0-1, then go from floating point space to integer space. Bottom edge always rounded down, top either up or down rounding. Random rounding good. Keeps code at different sizes. 
+
+
+For next week: work on 2 finger algorithm ^^
+-----------------------------------------------
+
+
+
+
+# node1 = Node()
+# ShapeDef(self, sq, node1)
+# startshape = dsdlkj
+# assuming pr1, pr2:
+# program3 = Program(pr1.startshape {})
+# program3.addshape(something) = will add to dictionary 
+
+
+# alignandcross (context, shape):
+# 	crossover(context, shape, match) - if shape uses foo as subshape, will call alignandcross with foo as shape parameter
+# will always have name of certain arg. 
+# will return an entire program 
+# context would refer to pr1, pr2, depth (This incremented, and we would quit at a point)
+
+# will need a merge programs one as well 
+
+# separate function for cross params. 
+
+# shapedef has name, list of nodes, method that turns to string
+
+# def createImage2(code):
+# 	if (not os.path.exists("output")):
+# 		os.mkdir("output")
+
+# 	with open("output/code.cfdg", "w") as fout:
+# 		fout.write(code)
+
+# 	subprocess.run(["ContextFree/ContextFreeCLI.exe", "output/code.cfdg", "output/result2.png"])
+
+# createImage2(templateBuild(test2))
+
+# will randomly pick left or right first, set left to current
+
+# def crossover(left, right):
+# 50 percent return copy of left (new node that is equivilant, except with crossover function applied to each child)
+# if type(left) (use is instance?) = node - check if node, not a number 
+# if random less than percent
+# 	crossover: return  crossover (find_crossover(right, left))
+# else
+# 	don't crossover: result type (left)()
+# 		for c in left.children : result.append (Crossover (c, right))
+
+	# preferentially crossover with similar size - need a function that finds the best crossovers
+	# takes in a node, node type, node size 
+	# first check probability of crossover. Need to get a height function in node - do children have children? recurse. 
+
+
+
+# class Number, variable - name that is a string, want without quotes 
+# repr of a string adds quotes
+# class parameter also 
+
+
+
+----- old code ----- (more in oldcode.py)
+
+
+# class Operator:
+# 	def __str__(self):
+# 		return str(self.lhs) + self.opsStr + str(self.rhs)
+# 	def __init__(self, lhs, rhs):
+# 		self.rhs = rhs
+# 		self.lhs = lhs
+
+# class Plus(Operator):
+# 	opsStr = "+"
+
+# class Minus(Operator):
+# 	opsStr = "-"
+
+# class Multiply(Operator):
+# 	opsStr = "*"
+
+# class Divide(Operator):
+# 	opsStr = "/"
+
+
+
+	# return """
+	# startshape blah
+	# CF::Background = [hue 199 sat 1 b -0.435 ]
+	# CF::MinimumSize =  0.186
+	# shape blah {
+	# blah2 [alpha -1]
+	# blah2 [ flip 65 alpha -1 x 5 b 1]
+	# blah2 [alpha - 2 y -5 b 1]
+	# blah2 [flip 90 alpha -1 x 5 y -5]
+	# }
+	# shape blah2 {{
+	# {}
+	# }}
+
+	# """.format(str(object))
+
+
+
+	# args = []
+	# if (s1.__class__ == (Triangle or Square or Circle)): # want to swap shapes
+	# 	for i in range(len(s1.children)):
+	# 		rand = random.uniform(0, 100)
+	# 		if (rand > likely):
+	# 			args.append(s1.children[i])				# do I want chance of getting all modifiers?
+	# 			print("here", args[i], s2.children[i])
+	# 			shapeCross(args[i], s2.children[i])
+	# 		else:
+	# 			args.append(s2.children[i])
+	# 			shapeCross(args[i], s1.children[i])
+
+	# # else:  # want to swap only values 
+	# # 	new = (copy.deepcopy(s1))
+	# # 	print("HERE", new.values)
+	# # 	for i in range(len(new.values)):
+	# # 		rand = random.uniform(0, 100)
+	# # 		if (rand > likely):
+	# # 			print("andHERE", new.values[i], s2.values[i])
+	# # 			newer = new.values[:i] + s2.values[i:]
+	# # 			print("NEWERHERE ", newer)
+	# # 			new = newer
+	# # 	print("newER", new)
+	# # 	return new
+
+	# print("FINALLY ", str(args[0])) # currently a list that looks like code, not objects 
+	# if (ran > likely):
+	# 	child = Square(args)
+	# else: 
+	# 	child = Triangle(args)
