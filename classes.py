@@ -26,37 +26,46 @@ class NonTerminal:
 		return ("\n".join(str(k) for k in self.children))
 	def __init__ (self, *children, program = None):
 		self.children = children
-		self.program = program
-	def setProgram (p):
-		self.program = p
 		for c in self.children:
-			c.setProgram(p)
+			c.parent = self
+		self.program = program
+	def setProgram (self, p):              # should I have self here? yes
+		self.program = p
+		# for c in self.children:
+		# 	c.setProgram(c, p)
+	def addShapeDef (self, shapedef):
+		self.children.append(shapedef)
+		shapedef.parent = self
 	def __copy__ (self):
 		self.copyHelper({})
 	def copyHelper (self, dictionary):
 		if self in dictionary:
 			return dictionary[self]
 		else:
-			return NonTerminal(*[c.copyHelper(dictionary) for c in self.children], program = None)
+			result =NonTerminal(*[c.copyHelper(dictionary) for c in self.children], program = None)
+			dictionary[self] = result
+			return result
 
 class ShapeDef:
 	def __str__(self): #to code method
-		return "rule " + self.name + " " + str(self.weight) + "{\n" + "\n".join(str(x) for x in self.children) +  " \n } \n"
-	def __init__ (self, name, children, weight = 1):
-		self.name = name
+		return "rule " + self.parent.name + " " + str(self.weight) + "{\n" + "\n".join(str(x) for x in self.children) +  " \n } \n"
+	def __init__ (self, parent, children, weight = 1):
+		self.parent = parent
 		self.children = children
 		self.weight = weight
-	def setProgram (p):
-		self.program = p
-		for c in self.children:
-			c.setProgram(p)
+	# def setProgram (self, p):                                  # do I want this?
+	# 	self.program = p
+	# 	for c in self.children:
+	# 		c.setProgram(p)
 	def __copy__ (self):
 		self.copyHelper({})
 	def copyHelper (self, dictionary):
 		if self in dictionary:
 			return dictionary[self]
 		else:
-			return ShapeDef(name, [c.copyHelper(dictionary) for c in self.children], self.weight)
+			result = ShapeDef(None, [c.copyHelper(dictionary) for c in self.children], self.weight)
+			dictionary[self] = result
+			return result
 
 class Node:
 	def __str__(self):
@@ -69,7 +78,10 @@ class Node:
 		if self in dictionary:
 			return dictionary[self]
 		else:
-			return type(self)([c.copyHelper(dictionary) for c in self.children])
+			result = type(self)([c.copyHelper(dictionary) for c in self.children])
+			dictionary[self] = result
+			return result
+			
 # added copy
 class Shape(Node):
 	def __str__(self):
@@ -79,13 +91,6 @@ class Shape(Node):
 		self.name = name
 	def argsStr(self):
 		return " ".join(str(c)for c in self.children)
-	def __copy__ (self):
-		self.copyHelper({})
-	def copyHelper (self, dictionary):
-		if self in dictionary:
-			return dictionary[self]
-		else:
-			return type(self)([c.copyHelper(dictionary) for c in self.children])
 
 # need to copy?
 class SimpleShape (Shape):
@@ -100,6 +105,15 @@ class RuleCall (Shape):
 	def __str__(self):
 		self.name = self.rule.name
 		return super().__str__(self)
+	def __copy__ (self):
+		self.copyHelper({})
+	def copyHelper (self, dictionary):
+		if self in dictionary:
+			return dictionary[self]
+		else:
+			result = type(self)(self.rule.copyHelper(dictionary), [c.copyHelper(dictionary) for c in self.children])
+			dictionary[self] = result
+			return result
 
 # shapes
 class Square(SimpleShape):
@@ -167,35 +181,56 @@ parent1 = Triangle(Skew(20, 30), Brightness(.5) ) #, Hue(41312), Y(100))
 parent2 = Square(Transform(45, 100), Flip(5)) #, Alpha(3), Saturation(44))
 
 # 4 squares 
-parent3 = ShapeDef("newshape", [
+parent3 = ShapeDef(None, [
 	Square(Transform(-3, -3)), 
 	Square(Transform(3, 3)), 
 	Square(Transform(3, -3)), 
 	Square(Transform(-3, 3)) ])
 
-parent4 = ShapeDef("testshape", [
+parent4 = ShapeDef(None, [
 	Triangle(Y (10)), 
 	Triangle(Y (5)), 
 	Triangle(Y (0)) ])
 
-parent5 = ShapeDef("newshape", [
+parent5 = ShapeDef(None, [
 	Circle (X (2), Skew (12, 45), Hue (45), Rotate (33) ), 
 	Square(Transform(3, 3)), 
 	Triangle(Saturation (300), Alpha (43), Transform(4)),
-	Shape(parent4.name, Transform(1, 2)),
+	Shape("newshaape", Transform(1, 2)),
 	])
 
-nt3 = NonTerminal(parent3) 
 nt4 = NonTerminal(parent4)
+nt3 = NonTerminal(parent3) 
 nt5 = NonTerminal(parent5, parent3)
 
 program1 = Program("testshape", [nt3])
 program2 = Program("newshape",[nt4])
 program3 = Program("newshape",[nt5, nt4])
 
+print("p1 here: ", type(program1))
 nt3.setProgram(program1)
 nt4.setProgram(program2)
 nt5.setProgram(program3)
+
+# will pull needed code to make sure it calls everything it should
+def flattenProgram (nt):
+	result = []
+
+	for rule in nt:
+		for child in rule.children:
+			if isinstance(child, RuleCall):
+				result.append(child.rule) 
+
+	return result
+
+def pickPartner (rule, p1, p2):     # finding a suitable match - for shapedefs  add weights 
+	partner = None
+	parent = rule.parent.program  #how do we know?
+	otherParent = (p1, p2) [parent == p1]  # clever tuple work 
+
+	ran = random.choice(otherParent.children)
+
+	return random.choice(ran.children)
 
 # make a program into something of size 1, with each line taking a certain amount of space
 # program has a name and a list of shapes - startshape and shapes
@@ -206,7 +241,6 @@ def slicechildren (children, numparts):
 
 	for i in range (0, numparts):
 		ran = random.uniform(0,99)
-		
 		# the lower the number the fewer shapes will go into final program
 		# have higher chance of overlap - good for small programs, but LOTS of repetition, since breeding takes away varience
 		if (ran < 75):
@@ -216,14 +250,12 @@ def slicechildren (children, numparts):
 
 		start = i * size
 		toReturn[i] = children[start: (start + size1)]
-
-	# 	print("start ", start, "end ", start + size1)
-	# print ("returned ", toReturn)
+	
 	return toReturn
 
+# knows how to cross shapes - a single one at a time
 def crossSequences (s1, s2):
 	splits = [3, 4, 5, 8, 34]
-
 	numparts = splits[random.randint(0, (len(splits) -1 ))]
 	
 	p1arr = slicechildren(s1, numparts)
@@ -240,56 +272,44 @@ def crossSequences (s1, s2):
 
 	return attributes
 
-	# print("swap", swap)
-
-def flattenProgram (nt):
+# crossing the shapedefs - will cross its children: (simple)shapes
+# why do we need to know the parents?
+def crossShapeDef(rule, partner, p1, p2):   
 	result = []
+	rprog = rule.parent.program
+	pprog = partner.parent.program
+	children = rule.children
+	crosschildren = crossSequences(rule.chilren, partner.children)
 
-	for rule in nt:
-		for child in rule.children:
-			if isinstance(child, RuleCall):
-				result.append(child.rule)
+	# call cross attributes 
+	weight = random.choice([rule.weight, partner.weight])
 
-	return result
+	return ShapeDef(None, crosschildren, weight)
 
-def pickPartner (rule, p1, p2):
-	return 
-
-def crossShapeDef(rule, partner, p1, p2):
-	return
-
+# crosses nonterminals, which calls the crossing of its children: shapedefs
 def crossNT (nt1, nt2, p1, p2):
 	rules = crossSequences(nt1.children, nt2.children)
 	result = []
-
 	
 	for rule in rules:
-		partner = pickPartner (rule, p1, p2)
+		partner = pickPartner (rule, p1, p2) # a shapedef 
 		result.append[crossShapeDef(rule, partner, p1, p2)]
 
 	return flattenProgram(NonTerminal(*result))
 
-
-def scramblenames (program):
+def scramblenames (nts):
 # add unique prefixes to names of program - programs don't have names...
-	newName = program.startshape.name
-
-	for i in range (0, 10):
-		ran = random.choice(string.letters)
-		newName = ran + newName
-
-	new = Program(newName, program.shapes)
-	return new
+	i = 0
+	for nt in nts:
+		nt.name += str(i) # + nt.name(:20)
+		i += 1
 
 # crossover for programs - doesn't take care of shape parameters
 # will need to iterate if more than one shape
 def newprogram (p1, p2):	
-	scrambleNames(p1)
-	scrambleNames(p2)
-
 	result = crossNT(p1.startshape, p2.startshape, p1, p2)
+	scramblenames(result)                                           #does this mean we won't call any shapes correctly?
 	return (Program(result[0].name, result))
-
 
 # breeding and more generations
 
@@ -345,9 +365,7 @@ def createImage(code):
 # createImage(str(programarr[0]))
 # print(str(programarr[0]))
 
-
 # print("program 2: ", str(programarr[1]))
-
 
 # print("new program: ", str(newprogram(program1, program2)))
 print(str(program3))
