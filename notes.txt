@@ -1,9 +1,74 @@
+-----------3/6---------------------
+
+scramblenames not working - won't name sub program correctly (lower priority problem, currently)
+make sure rulecopy correct
+classes line - c.parent - list has no parent
+functions flattenprogram - nonterminal not iterable
+when does a program use findNT?
+
+Questions:
+How to do something like this? Is this a nonterminal or a shapedef? I think nonterminal, 
+can a nonterminal contain another?
+
+	shape blah {
+	blah2 [alpha -1]
+	blah2 [ flip 146 alpha -1 x 5 b 1]
+	blah2 [alpha - 2 y -5 b 1]
+	blah2 [flip  146 alpha -1 x 5 y -5]
+	}
+
+
+Should I start writing paper part over spring break?
+
 -------------3/3--------------------
 Need to finish: scramblenames, crossShapeDef, pickPartner, see if copy correct
 
 scramblenames: programs don't have names - can change startshape, but it's not very useful
-crossShapeDef:
+crossShapeDef: why do we need to know parents? are we crossing the originals?
 pickPartner: 
+
+^^ should have fixed these things
+
+now: setProgram() takes 1 positional argument but 2 were given
+	added self to setProgram, but says three args given instead
+
+why does shapedef have a setProgram? doesn't know what a program is... Right - it shouldn't.
+
+^^ no longer relevant 
+
+Need to make sure strings working, scrambling not messing up the way it calls things 
+
+
+To work on:
+
+scrambling only returning parent
+This error:
+		p1 here:  <class '__main__.Program'>
+		Traceback (most recent call last):
+		  File "classes.py", line 373, in <module>
+		    aProgram = newprogram(program1, program2)
+		  File "classes.py", line 324, in newprogram
+		    result = crossNT(p1.startshape, p2.startshape, p1, p2)
+		  File "classes.py", line 312, in crossNT
+		    return flattenProgram(NonTerminal(name, *result))
+		  File "classes.py", line 36, in __init__
+		    c.parent = self
+		AttributeError: 'list' object has no attribute 'parent'
+And this:
+		p1 here:  <class '__main__.Program'>
+		Traceback (most recent call last):
+		  File "classes.py", line 373, in <module>
+		    aProgram = newprogram(program1, program2)
+		  File "classes.py", line 324, in newprogram
+		    result = crossNT(p1.startshape, p2.startshape, p1, p2)
+		  File "classes.py", line 312, in crossNT
+		    return flattenProgram(NonTerminal(name, *result))
+		  File "classes.py", line 227, in flattenProgram
+		    for rule in nt:
+		TypeError: 'NonTerminal' object is not iterable
+
+Fix rulecall copy 
+
 
 
 -------------2/27-------------------
