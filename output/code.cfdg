@@ -1,20 +1,13 @@
 
-		startshape nt5
+		startshape blah
 		CF::Background = [hue 120 sat 1 b -0.5]
 		CF::MinimumSize = 0.1
-		shape nt5
-rule 1{
-SQUARE [trans -3 -3]
-SQUARE [trans 3 3]
-SQUARE [trans 3 -3]
-SQUARE [trans -3 3] 
- } 
-
-rule 1{
-SQUARE [trans -3 -3]
-SQUARE [trans 3 3]
-SQUARE [trans 3 -3]
-SQUARE [trans -3 3] 
+		shape blah
+rule 1.0{
+CIRCLE [h 44.63194291278504 b 160.1080082460902 trans 3.5407483267162565 skew 16.46630991751277 33.89787486746153]
+SQUARE [trans 3.5407483267162565 sat 17.35305537158838]
+TRIANGLE [y 32.586766315193444 h 44.63194291278504 skew 16.46630991751277 33.89787486746153]
+TRIANGLE [y 32.586766315193444 h 44.63194291278504 skew 16.46630991751277 33.89787486746153] 
  } 
 
 		

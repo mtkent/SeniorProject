@@ -1,9 +1,59 @@
+------------3/20-----------------
+next time:
+	fitness, hard code two/three programs, disable mutation, weighted rule calls, extra shapedef chance 
+
+to do:
+	scramblenames (get recursion first?)
+	fix flattening (what's wrong with this?)
+	nesting programs (naming/flattening?)
+
+	write unit tests for copying   - how to do this? does not recognize two (same?) objects
+	
+	also look at recursive definition
+		define definition, add rule call to rule that recurses 
+
+	when adding a shapedef as a child of a shapedef, just call its name?
+
+
+
+	---- meeting ----
+	fix copying 
+		-> unittest for copying problem
+	shapedef as child of shapedef - create a rule call?
+		rulecall only works with shapes? not shapedefs?
+		what about nonterminals? -> currently unhappy with this
+
+
+
+notes:
+	two rules - if breeding, will be the same, eventually
+
+
+breeding program 3: will sometimes produce  
+	SQUARE [[<classes.Transform object at 0x01FA7DD0>]]  - current solution, delete when this happens
+instead of code - one level too deep. 
+	will only do this with squares from program3 itself. 
+
+did:
+	fixed rules/program 3 problem (might need to address later)
+	added mutation and parameter swapping (also a little bit mutate-y)
+
+questions:
+	classes line 84 - I think copying is off here - should be extend?
+		not necessarily off there, but need to track down that bug. 
+
+-------------------------------------
+flatten not working, also weird behavior with nesting programs
+
 -----------3/6---------------------
+write unit tests for copying 
+also look at recursive definition
+	define definition, add rule call to rule that recurses 
+
 
 scramblenames not working - won't name sub program correctly (lower priority problem, currently)
 make sure rulecopy correct
-classes line - c.parent - list has no parent
-functions flattenprogram - nonterminal not iterable
+
 when does a program use findNT?
 
 Questions:
@@ -18,7 +68,7 @@ can a nonterminal contain another?
 	}
 
 
-Should I start writing paper part over spring break?
+Should I start writing paper part over spring break? probably a good idea 
 
 -------------3/3--------------------
 Need to finish: scramblenames, crossShapeDef, pickPartner, see if copy correct

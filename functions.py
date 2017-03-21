@@ -6,7 +6,10 @@ import os
 import copy
 import string
 import classes
-from classes import Triangle, Square, Circle, Skew, Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform, ShapeDef, NonTerminal, Shape, Program, RuleCall
+from classes import Triangle, Square, Circle, Skew, Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform, ShapeDef, NonTerminal, Shape, Program, RuleCall, Modifier
+
+mod1 = ["a", "b", "sat", "h", "y", "z", "r", "f", "x"]
+mod2 = ["s", "skew"]
 
 # will pull needed code to make sure it calls everything it should
 def flattenNT (nt, soFar = None):
@@ -28,7 +31,7 @@ def pickPartner (rule, p1, p2):     # finding a suitable match - for shapedefs
 # TODO:  add weights to try to find a match that is a similar weight 
 	parent = rule.parent.program 
 	otherParent = (p1, p2) [parent == p1]  # clever tuple work 
-	print("parent", parent, "otherParent", otherParent)
+
 	ran = random.choice(otherParent.shapes)
 
 	return random.choice(ran.children)
@@ -59,11 +62,44 @@ def slicechildren (children, numparts):
 		
 	return toReturn
 
+
+
+paramArr = []
+
+# sort of mutation/crossover hybrid
+def crossParams (param):
+	ran = random.uniform(0, 99)
+	if ran < 30:
+		return random.choice(paramArr)
+	else:
+		return param
+
+def mutateParams (param):  # disable 
+	ran = random.uniform(0, 99)
+	toReturn = param
+	if param in mod1:
+		if ran < 3:
+			toReturn = random.choice(mod1)
+
+	elif param in mod2:
+		if ran < 3:
+			toReturn = random.choice(mod2)
+
+	return toReturn
+
+def mutateParamVal (param):
+	ran = random.uniform(0, 99) 
+	if ran > 94:
+		return param * 1.01
+	if ran < 5:
+		return param * 0.99
+	else:
+		return param
+
 # knows how to cross shapes - a single one at a time
 def crossSequences (s1, s2):
 	splits = [3, 4, 5, 8, 34]
 	numparts = random.choice(splits)
-	print(numparts, "numparts")
 	p1arr = slicechildren(s1, numparts)
 	p2arr = slicechildren(s2, numparts)
 
@@ -73,14 +109,21 @@ def crossSequences (s1, s2):
 		
 		if (ran < 50):
 			attributes.extend(p1arr[i])
+			if len(p2arr[i]) > 0:
+				for j in range(len(p2arr[i])):
+					if not (j == 1 or j == 0):
+						paramArr.extend([j])
 		else:
 			attributes.extend(p2arr[i])
-
+			if len(p1arr[i]) > 0:
+				for j in range(len(p1arr[i])):
+					if not (j == 1 or j == 0):
+						paramArr.extend([j])
 	return attributes
 
 # crossing the shapedefs - will cross its children: (simple)shapes
 # why do we need to know the parents?
-def crossShapeDef(rule, partner, p1, p2):   
+def crossShapeDef(rule, partner, p1, p2):   #add extra rule - more complexity 
 	result = []
 	rprog = rule.parent.program
 	pprog = partner.parent.program
@@ -88,7 +131,42 @@ def crossShapeDef(rule, partner, p1, p2):
 	crosschildren = crossSequences(rule.children, partner.children)
 
 	# call cross attributes 
+
 	weight = random.choice([rule.weight, partner.weight])
+	lenVar = len(crosschildren)
+	n = 0
+
+	for c in range(lenVar):
+		for n in range(lenVar):
+			if n < lenVar:
+				if lenVar > 0:
+					for i in crosschildren[n].children:
+						if (isinstance(i, list)):
+							crosschildren.remove(crosschildren[n]) 
+							lenVar -= 1
+							n = 0
+						else: 
+							paramArr.extend([i]) # all of the current params
+							n += 1
+
+	if (len(crosschildren) == 0):
+		return crossShapeDef(rule, partner, p1, p2)		
+	
+	# good place for mutation?
+	for c in range(len(crosschildren)):
+		newChildren = []
+		for p in crosschildren[c].children:
+			old = p
+			# p = crossParams(p)
+			newName = mutateParams(p.name)
+			newValues = []
+			for val in p.values:
+				newValues.append (mutateParamVal(val))
+
+			p.name = newName
+			p.values = newValues
+			newChildren.extend([p])
+			crosschildren[c].children = newChildren
 
 	return ShapeDef(None, crosschildren, weight)
 
@@ -100,11 +178,12 @@ def crossNT (nt1, nt2, p1, p2):
 	
 	for rule in rules:
 		partner = pickPartner (rule, p1, p2) # a shapedef 
-		print("rule", rule)
-		print("partner", partner)
 		newShapeDef = crossShapeDef(rule, partner, p1, p2)
-		print("new shape", newShapeDef)
 		result.append(newShapeDef)
+
+	lenVar = len(result)
+	for i in range(lenVar):
+		result[i].weight = 1/lenVar
 
 	ran = random.uniform(0,99)
 	if ran > 50:
@@ -112,7 +191,7 @@ def crossNT (nt1, nt2, p1, p2):
 	else:
 		name = nt2.name
 
-	returnNT = NonTerminal(name, *result)
+	returnNT = NonTerminal(name, result)
 	return flattenNT(returnNT)
 
 def scramblenames (nts):
@@ -126,7 +205,6 @@ def scramblenames (nts):
 # will need to iterate if more than one shape
 def newprogram (p1, p2):	
 	result = crossNT(p1.startshape, p2.startshape, p1, p2)
-	print("result", result, "result")
 
 	# scramblenames(result)                                           #does this mean we won't call any shapes correctly?
 	return (Program(result[0].name, result))
