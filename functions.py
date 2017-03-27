@@ -8,8 +8,8 @@ import string
 import classes
 from classes import Triangle, Square, Circle, Skew, Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform, ShapeDef, NonTerminal, Shape, Program, RuleCall, Modifier
 
-mod1 = ["a", "b", "sat", "h", "y", "z", "r", "f", "x"]
-mod2 = ["s", "skew"]
+# mod1 = ["a", "b", "sat", "h", "y", "z", "r", "f", "x"]
+# mod2 = ["s", "skew"]
 
 # will pull needed code to make sure it calls everything it should
 def flattenNT (nt, soFar = None):
@@ -75,15 +75,15 @@ def crossParams (param):
 		return param
 
 def mutateParams (param):  # disable 
-	ran = random.uniform(0, 99)
+	# ran = random.uniform(0, 99)
 	toReturn = param
-	if param in mod1:
-		if ran < 3:
-			toReturn = random.choice(mod1)
+	# if param in mod1:
+	# 	if ran < 3:
+	# 		toReturn = random.choice(mod1)
 
-	elif param in mod2:
-		if ran < 3:
-			toReturn = random.choice(mod2)
+	# elif param in mod2:
+	# 	if ran < 3:
+	# 		toReturn = random.choice(mod2)
 
 	return toReturn
 
@@ -158,12 +158,12 @@ def crossShapeDef(rule, partner, p1, p2):   #add extra rule - more complexity
 		for p in crosschildren[c].children:
 			old = p
 			# p = crossParams(p)
-			newName = mutateParams(p.name)
+			# newName = mutateParams(p.name)
 			newValues = []
 			for val in p.values:
 				newValues.append (mutateParamVal(val))
 
-			p.name = newName
+			# p.name = newName
 			p.values = newValues
 			newChildren.extend([p])
 			crosschildren[c].children = newChildren
@@ -175,18 +175,25 @@ def crossNT (nt1, nt2, p1, p2):
 	rules = crossSequences(nt1.children, nt2.children)
 	# print("rules", rules, "rules")
 	result = []
-	
+
 	for rule in rules:
 		partner = pickPartner (rule, p1, p2) # a shapedef 
 		newShapeDef = crossShapeDef(rule, partner, p1, p2)
 		result.append(newShapeDef)
 
-	lenVar = len(result)
-	for i in range(lenVar):
-		result[i].weight = 1/lenVar
+	# lenVar = len(result)
+	# for i in range(lenVar):
+	# 	result[i].weight = 1/lenVar
 
 	ran = random.uniform(0,99)
+
+	# 50 percent chance of an extra shapedef
 	if ran > 50:
+		rule = random.choice(rules)
+		partner = pickPartner (rule, p1, p2) # a shapedef 
+		newShapeDef = crossShapeDef(rule, partner, p1, p2)
+		result.append(newShapeDef)
+		
 		name = nt1.name
 	else:
 		name = nt2.name
@@ -216,22 +223,47 @@ def programreproduce(arr, prog1, prog2):
 		child = newprogram(prog1, prog2)
 		arr[i] = child
 
+def fitness (program):
+	# want to determine the size of the program
+	return len(program.shapes)
 
+def avgFitness (parr):
+	total = 0
+	num = len (parr)
+	for i in range (num):
+		total += fitness(parr[i])
+
+	return (total/num)
+
+def pickProgram (programarr, num):
+	avg = avgFitness(programarr)
+	p1 = programarr[num]
+	
+	ran = int(random.uniform(0,99))
+
+	if (fitness(p1) < avg):
+		p1 = pickProgram(programarr, ran)
+
+	return p1
+
+# add fitness here
 def programbreed (programarr):
 	# firsthalf = programarr[0:49]
 	# secondhalf = programarr[50:99]
-	for _ in range(100):
-		newarr = []
+	for _ in range(10):
+		# newarr = []
 		
 		ran = int(random.uniform(0,99))
 		rand = int(random.uniform(0,99))
+		# if they want to pick the same program ... this might be okay
 		if (ran == rand):
 			if (rand < 99):
 				rand = rand + 1
 			else:
 				rand = rand - 1
-		p1 = programarr[ran]
-		p2 = programarr[rand]
+		# the new programs to breed
+		p1 = pickProgram(programarr, ran)
+		p2 = pickProgram(programarr, rand)
 		# p3 = firsthalf[math.ceil(ran/2)]
 		# p4 = secondhalf[math.ceil(rand/2)]
 

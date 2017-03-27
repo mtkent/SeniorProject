@@ -1,13 +1,21 @@
 startshape blah
-CF::Background = [hue -5000 sat 1 b -0.305 ]
-CF::MinimumSize =  0.012
-shape blah {
-blah2 [alpha -1]
-blah2 [ flip 52 alpha -1 x 5 b 1]
-blah2 [alpha - 9 y -5 b 1]
-blah2 [flip 50 alpha -1 x 5 y -5]
-}
-shape blah2 {
- SQUARE []
-blah2 [alpha 0.0001 r  13.17 ..10 x 1 s  0.9991 ]
-}
+CF::Background = [hue 120 sat 1 b -0.5]
+CF::MinimumSize = 0.1
+shape blah
+rule 1{
+blah2 [a -1]
+blah2 [f 163 a -1 x 1 b 1]
+blah2 [a -10 y -5 b 1]
+blah2 [f 163 a -1 x 5 y -5]
+ }
+
+rule 0.1{
+CIRCLE []
+ }
+
+shape blah2
+rule 1{
+TRIANGLE []
+blah2 [a 0.04 r 47.83 ..10 x 1 sat 0.9995]
+ }
+

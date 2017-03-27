@@ -1,8 +1,8 @@
 # imports
 import classes
-from classes import Triangle, Size, Square, Circle, Skew, Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform, ShapeDef, NonTerminal, Shape, Program, RuleCall
+from classes import Triangle, Size, Square, Circle, Skew, Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform, ShapeDef, NonTerminal, Shape, Program, RuleCall, randRange
 import functions
-from functions import newprogram, createImage, programbreed, programreproduce, scramblenames, crossParams
+from functions import newprogram, createImage, programbreed, programreproduce, scramblenames, crossParams, fitness, avgFitness
 
 # starter parents
 parent1 = Triangle([Skew(20, 30), Brightness(.5)] ) #, Hue(41312), Y(100)) 
@@ -59,16 +59,18 @@ terminatingShape = ShapeDef (None, [
 	])
 
 blah2shape = ShapeDef(None, blahargs)
-blah2 = NonTerminal("blah2", [blah2shape, terminatingShape])
+blah2 = NonTerminal("blah2", [blah2shape])
 
 
-terminatingShape.weight = 0.01
+terminatingShape.weight = 0.1
 
-blahargs.append(RuleCall(blah2, [Alpha (0.8), Rotate (47.8), X (1), Saturation (0.9995)]))
+blahargs.append(RuleCall(blah2, [Alpha (0.04), Rotate (47.83), randRange(10), X (1), Size (0.9995), Saturation(0.7)]))
 
 blahshape = ShapeDef(None, [
 	RuleCall(blah2, [Alpha (-1)]) ,
-	RuleCall(blah2, [Flip (163), Alpha (-1), X (5), Brightness (1)])
+	RuleCall(blah2, [Flip (163), Alpha (-1), X (1), Brightness (1)]), 
+	RuleCall(blah2, [Alpha (-10), Y (-5), Brightness(1)]), 
+	RuleCall(blah2, [Flip (163), Alpha (-1), X (5), Y (-5)])
 	])
 
 
@@ -81,25 +83,45 @@ program7 = Program ("blah", [nt6, blah2])
 
 nt6.setProgram(program7)
 
-# blah2 = ShapeDef(None, [
-
-# 	Shape ("blah2", Alpha (0.02), Rotate  (6.14), X (1), S (0.995))
-
-# 	])
-
-# blah = ShapeDef (None, [
-# 	Shape ("blah", )
-
-# 	])
 
 
-# shape blah {
-# blah2 [alpha -1]
-# blah2 [ flip 146 alpha -1 x 5 b 1]
-# blah2 [alpha - 2 y -5 b 1]
-# blah2 [flip  146 alpha -1 x 5 y -5]
-# }
+# https://contextfreeart.org/gallery/view.php?id=3807
 
+armArgs1 = [
+	Circle ([]), 
+	]
+
+armArgs2 = [
+	Circle ([]), 
+	]
+
+armShape1 = ShapeDef(None, armArgs1, 98)
+armShape2 = ShapeDef(None, armArgs2, 2)
+
+arm = NonTerminal("arm", [armShape1, armShape2])
+armArgs1.append(Circle([Size (0.9), Brightness (1)]))
+armArgs1.append(RuleCall (arm, [Y (0.2), Size (0.99), Rotate (3)]))
+
+
+armArgs2.append(
+	Circle([Size (0.9), Brightness (1)])
+	)
+armArgs2.append(RuleCall (arm, [Y (0.2), Size (0.99), Flip (90)]))
+armArgs2.append(RuleCall (arm, [Y (0.2), Size (0.6), Brightness(0.2)]))
+
+tendrisShape = ShapeDef (None, [
+	RuleCall (arm, [Hue (348.16), Saturation (0.7039), Brightness (1.0000)]),
+	RuleCall (arm, [Flip (90), Hue (282.99), Saturation (0.7412), Brightness (1)])
+])
+ 
+
+
+tendris = NonTerminal("tendris", [tendrisShape])
+
+online1 = Program("tendris", [tendris, arm])
+
+tendris.setProgram(online1)
+arm.setProgram(online1)
 
 
 # nonterminals from more complicated parents
@@ -120,24 +142,162 @@ nt3.setProgram(program1)
 nt4.setProgram(program2)
 nt5.setProgram(program3)
 
-# # # # a single program
-# aProgram = newprogram(program7, program3)
-# # # print("P1 HERE", str(program1))
-# # # print("P3 HERE", str(program3))
+
+
+# https://contextfreeart.org/gallery/view.php?id=122
+cs1args = [
+	Square([])
+]
+cs2args = [
+	Circle ([Size (3.5), Brightness (0.5)])
+]
+cs3args = [
+	Square([])
+]
+
+flowerArgs = [
+	Triangle([Size (15, 1), Rotate (45)])
+]
+flowerShape = ShapeDef(None, flowerArgs)
+flower = NonTerminal("flower", [flowerShape])
+flowerArgs.append(RuleCall(flower, [Size (0.9), Rotate(45)]))
+
+startArgs = []
+sceneArgs = []
+
+curveShape1 = ShapeDef(None, cs1args, 1)
+curveShape2 = ShapeDef(None, cs2args, 0.007)
+curveShape3 = ShapeDef(None, cs3args, 0.01)
+
+sceneShape = ShapeDef(None, sceneArgs)
+startShape = ShapeDef(None, startArgs)
+start = NonTerminal("start", [startShape])
+
+
+curve = NonTerminal("curve", [curveShape1, curveShape2, curveShape3])
+cs1args.append(RuleCall(curve, [Y (1), Size (0.997), Rotate (5)])) 
+cs2args.append(RuleCall(curve, [Y (1), Size (0.99), Rotate (10)]))
+cs3args.append(RuleCall(flower, []))
+cs3args.append(RuleCall(curve, [Y (1), Size (0.99), Rotate (-40), Skew (10, 0)]))
+
+scene = NonTerminal("scene", [sceneShape])
+sceneArgs.append(RuleCall(curve, []))
+sceneArgs.append(RuleCall(start, [Size (0.995), Rotate (20), Brightness (0.01), Hue (0.1), Saturation (0.8)]))
+
+startArgs.append(RuleCall(scene, [Brightness (0.01), Hue (0), Saturation (0.8)]))
+
+online2 = Program("start", [start, scene, curve, flower])
+curve.setProgram(online2)
+scene.setProgram(online2)
+flower.setProgram(online2)
+start.setProgram(online2)
+
+
+# currently not able to code because we don't have multiplication of a rule implemented 
+# # https://contextfreeart.org/gallery/view.php?id=2489
+
+# chaosShapeArgs = [
+# 	Circle([Hue random.range(0, 365)])
+# ]
+# chaosShape = ShapeDef(None, [chaosShapeArgs])
+
+# chaosShapeArgs.append(
+# 	RuleCall
+# 	)
+ 
+# 100 * { r rand_static(0, 360)  s .89 h 4 sat .018  b .08}  chaos{ y 1 s.5  r
+# (rand_static(0, 360)) f 90}
+ 
+
+# chaos = NonTerminal("chaos", [chaosShape])
+
+# online3 = Program("chaos", [chaos])
+# chaos.setProgram(online3)
+
+
+# https://contextfreeart.org/gallery/view.php?id=185
+
+
+wsArg1 = []
+wsArg2 = [
+	Square ([])
+]
+wsArg3 = [
+	Square([])
+]
+wsArg4 = []
+
+wallShape1 = ShapeDef (None, wsArg1)
+wallShape2 = ShapeDef (None, wsArg2)
+wallShape3 = ShapeDef (None, wsArg3, 0.09)
+wallShape4 = ShapeDef (None, wsArg4, 0.005)
+
+wall = NonTerminal("wall", [wallShape1, wallShape2, wallShape3, wallShape4])
+
+wsArg1.append(RuleCall(wall, [Y (0.95), Rotate (1), Size (0.975)]))
+wsArg2.append(RuleCall(wall, [Y (0.95), Rotate (-1), Size (0.975), Saturation (0.1), Brightness (0.01), Hue (0.1)]))
+wsArg3.append(RuleCall(wall, [Y (0.95), Rotate (90), Size (0.975)]))
+wsArg3.append(RuleCall(wall, [Y (0.95), Rotate (-90), Size (0.975)]))
+wsArg4.append(RuleCall(wall, [Y (0.97), Rotate (90), Size (1.5)]))
+wsArg4.append(RuleCall(wall, [Y (0.97), Rotate (-90), Size (1.5)]))
+
+ancientmapShape = ShapeDef(None, [
+	RuleCall(wall, [Brightness (0.1), Hue (34)]),
+	RuleCall(wall, [Brightness (0.1), Rotate (180), Hue (34)])
+	])
+ancientmap = NonTerminal("ancientmap", [ancientmapShape])
+
+online4 = Program("ancientmap", [ancientmap, wall])
+ancientmap.setProgram(online4)
+wall.setProgram(online4)
+
+
+# https://contextfreeart.org/gallery/view.php?id=1974           -- to do?
+
+
+# https://contextfreeart.org/gallery/view.php?id=1872
+sunShapeArgs = []
+cordShapeArgs = [
+	Circle([Saturation (1), Hue (270)])
+] 
+sunShape = ShapeDef(None, sunShapeArgs)
+
+cordShape = ShapeDef(None, cordShapeArgs)
+
+ 
+sun = NonTerminal("sun", [sunShape])
+cord = NonTerminal("cord", [cordShape])
+
+sunShapeArgs.append(RuleCall(cord, []))
+sunShapeArgs.append(RuleCall(sun, [X (1), Rotate (60), Hue (3), Saturation (-0.19), Size (0.999), Brightness (0.1)]))
+cordShapeArgs.append(RuleCall(cord, [Y (1), Rotate (60.1), Size (0.98)]))
+
+online5 = Program ("sun", [sun, cord])
+sun.setProgram(online5)
+cord.setProgram(online5)
+
+
+# # # a single program
+# aProgram = newprogram(online2, online1)
+# # print("P1 HERE", str(program1))
+# # print("P3 HERE", str(program3))
 
 # print(str(aProgram))
-
+# fitness(aProgram)
 # createImage(str(aProgram))
 
 
 # for breeding/reproducing
 programarr = [None] * 100
 
-programreproduce(programarr, program3, program7)
+programreproduce(programarr, online1, online4)
 programbreed(programarr)
+
+
 createImage(str(programarr[0]))
 print(str(programarr[0]))
-
+print(avgFitness(programarr), "AVG FITNESS")
+print(fitness(programarr[0]), "THIS FITNESS")
 
 
 
@@ -150,5 +310,5 @@ print(str(programarr[0]))
 # scramblenames(program3.shapes)
 # print(str(program3))
 
-# createImage(str(program3))
-# print(str(program7))
+# createImage(str(online5))
+# print(str(online5))

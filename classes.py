@@ -210,6 +210,10 @@ class Transform(Modifier):
 class Skew(Modifier):
 	name = "skew"	
 
+# takes 1
+class randRange(Modifier):
+	name = ".."
+
 class Value:
 	def __str__(self):
 		return repr(self.val)

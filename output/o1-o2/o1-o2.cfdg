@@ -1,0 +1,66 @@
+
+		startshape start
+		CF::Background = [hue 120 sat 1 b -0.5]
+		CF::MinimumSize = 0.1
+		shape start
+rule 1{
+scene [b 0.01 h 0 sat 0.8]
+CIRCLE [s 0.891 b 1]
+arm [y 0.2 s 0.99 f 90] 
+ } 
+
+rule 98{
+scene [b 0.01 h 0 sat 0.8]
+CIRCLE [s 0.9 b 1]
+arm [y 0.2 s 0.9999 r 2.9699999999999998] 
+ } 
+
+shape scene
+rule 1{
+curve []
+start [s 0.995 r 20 b 0.01 h 0.1 sat 0.8] 
+ } 
+
+shape curve
+rule 1{
+SQUARE []
+curve [y 1 s 0.997 r 5] 
+ } 
+
+rule 0.007{
+CIRCLE [s 3.5 b 0.5]
+curve [y 1 s 0.99 r 10] 
+ } 
+
+rule 0.01{
+SQUARE []
+flower []
+curve [y 1 s 0.99 r -40 skew 10 0] 
+ } 
+
+shape flower
+rule 1{
+TRIANGLE [s 15 1 r 45]
+flower [s 0.9 r 45] 
+ } 
+
+shape start
+rule 1{
+scene [b 0.01 h 0 sat 0.8] 
+ } 
+
+shape arm
+rule 98{
+CIRCLE []
+CIRCLE [s 0.9 b 1]
+arm [y 0.2 s 0.9999 r 2.9699999999999998] 
+ } 
+
+rule 2{
+CIRCLE []
+CIRCLE [s 0.891 b 1]
+arm [y 0.2 s 0.99 f 90]
+arm [y 0.2 s 0.6 b 0.2] 
+ } 
+
+		

@@ -9,5 +9,5 @@ blah2 [flip  291 alpha -1 x 5 y -5]
 }
 shape blah2 {
  CIRCLE []
-blah2 [alpha 0.02  r  34.92 ..10 x 1 s 0.995 ]
+blah2 [alpha 0.02  r  34.92 ..10 x 1 s .995 ]
 }

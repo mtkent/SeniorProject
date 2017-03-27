@@ -199,29 +199,29 @@ def templateBuild(object):
 
 
 # was in what is now newprogram
-	# splits = [3, 4, 5, 8, 34]
+# 	splits = [3, 4, 5, 8, 34]
 
-	# numparts = splits[random.randint(0, (len(splits) -1 ))]
+# 	numparts = splits[random.randint(0, (len(splits) -1 ))]
 	
-	# p1arr = slicechildren(p1.shapes[0].children, numparts)
-	# p2arr = slicechildren(p2.shapes[0].children, numparts)
+# 	p1arr = slicechildren(p1.shapes[0].children, numparts)
+# 	p2arr = slicechildren(p2.shapes[0].children, numparts)
 
-	# attributes = []
-	# for i in range (0, numparts):
-	# 	ran = random.uniform(0,99)
+# 	attributes = []
+# 	for i in range (0, numparts):
+# 		ran = random.uniform(0,99)
 		
-	# 	if (ran < 50):
-	# 		# if (not p1arr[i] is None) and (not p2arr[i] is None):
-	# 		# if (len(p1arr[i]) > 0) and (len(p2arr[i]) > 0) and (len(p2arr) >= len(p1arr)):
-	# 		# 	for j in range (0, len(p1arr)):
-	# 		# swapmodifers(p1arr[i], p2arr[i])
-	# 		# swapmodifers(p1arr[i], p2arr[i])
-	# 		# 	print ("I SWAPPED")
-	# 		attributes.extend(p1arr[i])
-	# 	else:
-	# 		# swapmodifers(p2arr[i], p1arr[i])
-	# 		attributes.extend(p2arr[i])
-	# desired = crossSequences(p1.shapes, p2.shapes) # = nonterminals - highest level
+# 		if (ran < 50):
+# 			# if (not p1arr[i] is None) and (not p2arr[i] is None):
+# 			# if (len(p1arr[i]) > 0) and (len(p2arr[i]) > 0) and (len(p2arr) >= len(p1arr)):
+# 			# 	for j in range (0, len(p1arr)):
+# 			# swapmodifers(p1arr[i], p2arr[i])
+# 			# swapmodifers(p1arr[i], p2arr[i])
+# 			# 	print ("I SWAPPED")
+# 			attributes.extend(p1arr[i])
+# 		else:
+# 			# swapmodifers(p2arr[i], p1arr[i])
+# 			attributes.extend(p2arr[i])
+# 	desired = crossSequences(p1.shapes, p2.shapes) # = nonterminals - highest level
 
 
 

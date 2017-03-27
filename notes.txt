@@ -1,3 +1,22 @@
+-------3/27-------
+added fitness, of sorts. Does make them more complex, but not as good as an individual one might be. 
+Sometimes image won't load. Sometimes a complicated program still is just one shape.
+
+Multiplicity of rule calls problem. 
+
+
+----to do --------
+
+fitness          ---- in progress
+hardcode programs ---- done
+disable mutation --- done
+weighted rule calls  ---??
+extra shapedef chance --- done
+
+notes:
+need to scramble names if breeding two with same name.
+flattenprogram doesn't cross? something is happening where the recursion never goes in two directions
+
 ------------3/20-----------------
 next time:
 	fitness, hard code two/three programs, disable mutation, weighted rule calls, extra shapedef chance 
