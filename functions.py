@@ -247,23 +247,26 @@ def pickProgram (programarr, num):
 	return p1
 
 # add fitness here
-def programbreed (programarr):
+def programbreed (programarr, num):
 	# firsthalf = programarr[0:49]
 	# secondhalf = programarr[50:99]
-	for _ in range(10):
+	for _ in range(num):
 		# newarr = []
 		
 		ran = int(random.uniform(0,99))
 		rand = int(random.uniform(0,99))
 		# if they want to pick the same program ... this might be okay
-		if (ran == rand):
-			if (rand < 99):
-				rand = rand + 1
-			else:
-				rand = rand - 1
+		# if (ran == rand):
+		# 	if (rand < 99):
+		# 		rand = rand + 1
+		# 	else:
+		# 		rand = rand - 1
 		# the new programs to breed
-		p1 = pickProgram(programarr, ran)
+
+		p1 = pickProgram(programarr, ran)      # adding fitness increases avg, definitely, but does not mean better pic
 		p2 = pickProgram(programarr, rand)
+		# p1 = programarr[ran]
+		# p2 = programarr[rand]
 		# p3 = firsthalf[math.ceil(ran/2)]
 		# p4 = secondhalf[math.ceil(rand/2)]
 

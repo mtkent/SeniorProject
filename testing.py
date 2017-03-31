@@ -277,21 +277,22 @@ sun.setProgram(online5)
 cord.setProgram(online5)
 
 
-# # # a single program
-# aProgram = newprogram(online2, online1)
-# # print("P1 HERE", str(program1))
-# # print("P3 HERE", str(program3))
+# # # # # a single program
+# aProgram = newprogram(online1, online4)
+# # # # print("P1 HERE", str(program1))
+# # # # print("P3 HERE", str(program3))
 
 # print(str(aProgram))
-# fitness(aProgram)
+# print("my fitness: ", fitness(aProgram))
 # createImage(str(aProgram))
 
 
-# for breeding/reproducing
+
+# # for breeding/reproducing
 programarr = [None] * 100
 
 programreproduce(programarr, online1, online4)
-programbreed(programarr)
+programbreed(programarr, 10)
 
 
 createImage(str(programarr[0]))

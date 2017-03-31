@@ -3,7 +3,6 @@ class Program: # has startshape, which shapeDef, and a dictionary of nodes
 	def __str__(self):
 		return """
 		startshape {startshape}
-		CF::Background = [hue 120 sat 1 b -0.5]
 		CF::MinimumSize = 0.1
 		{shapes}
 		""".format(startshape = self.startshape.name, shapes = "\n".join(str(k) for k in self.shapes))
@@ -88,7 +87,6 @@ class Node:
 				cList.append(c.copyHelper(dictionary))
 			return result
 			
-# added copy
 class Shape(Node):
 	def __str__(self):
 		return "{} [{}]".format(self.name, self.argsStr() )
@@ -98,7 +96,6 @@ class Shape(Node):
 	def argsStr(self):
 		return " ".join(str(c)for c in self.children)
 
-# need to copy?
 class SimpleShape (Shape):
 	def __init__ (self, args):
 		super().__init__(None, args)

@@ -4,6 +4,14 @@ Sometimes image won't load. Sometimes a complicated program still is just one sh
 
 Multiplicity of rule calls problem. 
 
+questions:
+	what more can I say about CFA in the background info?
+	can I download CFA to school computers?
+	Change meeting: 4:05/10 on Tuesday
+
+	o2-o5s don't work well because of sizing difference, I think
+
+
 
 ----to do --------
 
