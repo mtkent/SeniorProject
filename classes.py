@@ -1,4 +1,5 @@
-# unit tests random.seed?
+# classes.py: contains all class definitions for program
+
 class Program: # has startshape, which shapeDef, and a dictionary of nodes
 	def __str__(self):
 		return """
@@ -47,14 +48,11 @@ class NonTerminal:
 			return result
 
 class ShapeDef:
-	def __str__(self): #to code method
+	def __str__(self): 
 		return "rule " + str(self.weight) + "{\n" + "\n".join(str(x) for x in self.children) +  " \n } \n"
 	def __init__ (self, parent, children, weight = 1):
 		self.parent = parent
 		self.children = children
-		# for c in self.children:
-		# 	if type(c) == ShapeDef:
-		# 		print("FOUND ONE ")
 		self.weight = weight
 	def __copy__ (self):
 		return self.copyHelper({})
@@ -124,17 +122,10 @@ class RuleCall (Shape):
 			result = type(self)(None, cList)
 			dictionary[self] = result
 			toPrint = self.rule.copyHelper(dictionary)
-			# print("setrule ", toPrint, "end toprint", toPrint.name)
 			result.setRule(toPrint)
-			# print("bool", toPrint == None)
-			# if result.rule == None:
-				# print("it's none")
 			for c in self.children:
 				cList.append(c.copyHelper(dictionary))
 
-			# if result.rule == None:
-				# print("it's none2")
-			# print("anything")
 			return result
 
 # shapes
@@ -159,12 +150,6 @@ class Modifier:
 		if self in dictionary:
 			return dictionary[self]
 		else:                                   
-			# cList = []
-			# result = type(self)(None, cList)
-			# dictionary[self] = result
-			# self.setRule(self.rule.copyHelper(dictionary))
-			# for c in self.children:
-			# 	cList.append(c.copyHelper(dictionary))
 			return type(self)(*self.values)
 
 # modifers and value

@@ -1,3 +1,5 @@
+# functions.py: contains all functions to be used for generating new programs
+
 # imports
 import math
 import random
@@ -8,6 +10,7 @@ import string
 import classes
 from classes import Triangle, Square, Circle, Skew, Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform, ShapeDef, NonTerminal, Shape, Program, RuleCall, Modifier
 
+# lists of all modifiers - not currently used
 # mod1 = ["a", "b", "sat", "h", "y", "z", "r", "f", "x"]
 # mod2 = ["s", "skew"]
 
@@ -17,8 +20,6 @@ def flattenNT (nt, soFar = None):
 		soFar = {nt}
 	result = [nt]
 
-	# print("FLATTENING", nt, "program", nt.program, "nt.children", nt.children)
-	# = FLATTENING shape program None nt3 nt.children ()
 	for rule in nt.children:
 		for child in rule.children:
 			if isinstance(child, RuleCall) and child not in result:
@@ -28,7 +29,6 @@ def flattenNT (nt, soFar = None):
 	return result
 
 def pickPartner (rule, p1, p2):     # finding a suitable match - for shapedefs 
-# TODO:  add weights to try to find a match that is a similar weight 
 	parent = rule.parent.program 
 	otherParent = (p1, p2) [parent == p1]  # clever tuple work 
 
@@ -44,10 +44,13 @@ def slicechildren (children, numparts):
 	size = int(math.ceil(len(children) / numparts))
 	splitAt = [0]
 	for i in range (numparts):
+		# has a list of numbers to split at 
 		splitAt.append(splitAt[-1] + size)
 
 
 	for i in range (numparts):
+
+		# old way of doing this: 
 
 		# ran = random.uniform(0,99)
 		# # the lower the number the fewer shapes will go into final program
@@ -58,6 +61,8 @@ def slicechildren (children, numparts):
 		# 	size1 = size - 1
 
 		# start = i * size
+
+		# will add to toReturn the index from one split to another 
 		toReturn[i] = children[splitAt[i]: splitAt[i + 1]]
 		
 	return toReturn
@@ -74,7 +79,8 @@ def crossParams (param):
 	else:
 		return param
 
-def mutateParams (param):  # disable 
+# picks a random param 
+def mutateParams (param):  # disabled 
 	# ran = random.uniform(0, 99)
 	toReturn = param
 	# if param in mod1:
@@ -87,6 +93,7 @@ def mutateParams (param):  # disable
 
 	return toReturn
 
+# increase or decrease by a percent - not always good for multiple generations
 def mutateParamVal (param):
 	ran = random.uniform(0, 99) 
 	if ran > 94:
@@ -122,7 +129,6 @@ def crossSequences (s1, s2):
 	return attributes
 
 # crossing the shapedefs - will cross its children: (simple)shapes
-# why do we need to know the parents?
 def crossShapeDef(rule, partner, p1, p2):   #add extra rule - more complexity 
 	result = []
 	rprog = rule.parent.program
@@ -136,6 +142,7 @@ def crossShapeDef(rule, partner, p1, p2):   #add extra rule - more complexity
 	lenVar = len(crosschildren)
 	n = 0
 
+# makes sure don't have double lists - maybe no longer needed 
 	for c in range(lenVar):
 		for n in range(lenVar):
 			if n < lenVar:
@@ -157,14 +164,14 @@ def crossShapeDef(rule, partner, p1, p2):   #add extra rule - more complexity
 		newChildren = []
 		for p in crosschildren[c].children:
 			old = p
-			# p = crossParams(p)
+			# p = crossParams(p)                   # don't do this.
 			# newName = mutateParams(p.name)
 			newValues = []
 			for val in p.values:
-				newValues.append (mutateParamVal(val))
+				newValues.append (mutateParamVal(val))       # param mutation
 
 			# p.name = newName
-			p.values = newValues
+			# p.values = newValues							# param mutation "switch"
 			newChildren.extend([p])
 			crosschildren[c].children = newChildren
 
@@ -173,17 +180,12 @@ def crossShapeDef(rule, partner, p1, p2):   #add extra rule - more complexity
 # crosses nonterminals, which calls the crossing of its children: shapedefs
 def crossNT (nt1, nt2, p1, p2):
 	rules = crossSequences(nt1.children, nt2.children)
-	# print("rules", rules, "rules")
 	result = []
 
 	for rule in rules:
 		partner = pickPartner (rule, p1, p2) # a shapedef 
 		newShapeDef = crossShapeDef(rule, partner, p1, p2)
 		result.append(newShapeDef)
-
-	# lenVar = len(result)
-	# for i in range(lenVar):
-	# 	result[i].weight = 1/lenVar
 
 	ran = random.uniform(0,99)
 
@@ -201,6 +203,7 @@ def crossNT (nt1, nt2, p1, p2):
 	returnNT = NonTerminal(name, result)
 	return flattenNT(returnNT)
 
+# not implemented - used if programs have same names. Maybe currently buggy?
 def scramblenames (nts):
 # add unique prefixes to names of program - programs don't have names...
 	i = 0
@@ -213,20 +216,35 @@ def scramblenames (nts):
 def newprogram (p1, p2):	
 	result = crossNT(p1.startshape, p2.startshape, p1, p2)
 
-	# scramblenames(result)                                           #does this mean we won't call any shapes correctly?
+	# scramblenames(result)                          #does this mean we won't call any shapes correctly?
 	return (Program(result[0].name, result))
 
-# breeding and reproduction
-
+# breeding and reproduction - creates 100 children
 def programreproduce(arr, prog1, prog2):
 	for i in range(100):
 		child = newprogram(prog1, prog2)
 		arr[i] = child
 
 def fitness (program):
-	# want to determine the size of the program
-	return len(program.shapes)
+	# new fitness: 
 
+	# want to determine the size of the program
+	# num = len(program.shapes)
+	# sum = 0
+	# total = 0
+	# for i in range (num):
+	# 	children = program.shapes[i].children   #shapedefs
+	# 	for j in range(len(children)):
+	# 		sum += len(program.shapes[i].children[j].children) # children of a shapedef: shapes: rules or simpleshapes
+	# 		total += 1
+
+	# avg = sum/total
+	# return avg  # number of things within rule
+	
+	# old fitness: 
+	return len(program.shapes) # num nonterminals
+
+ #  get average for a program
 def avgFitness (parr):
 	total = 0
 	num = len (parr)
@@ -235,6 +253,7 @@ def avgFitness (parr):
 
 	return (total/num)
 
+# make sure good fitness, pick a program
 def pickProgram (programarr, num):
 	avg = avgFitness(programarr)
 	p1 = programarr[num]
@@ -246,44 +265,26 @@ def pickProgram (programarr, num):
 
 	return p1
 
-# add fitness here
+# makes num generations from 100 children
 def programbreed (programarr, num):
-	# firsthalf = programarr[0:49]
-	# secondhalf = programarr[50:99]
+
 	for _ in range(num):
-		# newarr = []
 		
 		ran = int(random.uniform(0,99))
 		rand = int(random.uniform(0,99))
-		# if they want to pick the same program ... this might be okay
-		# if (ran == rand):
-		# 	if (rand < 99):
-		# 		rand = rand + 1
-		# 	else:
-		# 		rand = rand - 1
-		# the new programs to breed
 
 		p1 = pickProgram(programarr, ran)      # adding fitness increases avg, definitely, but does not mean better pic
 		p2 = pickProgram(programarr, rand)
-		# p1 = programarr[ran]
-		# p2 = programarr[rand]
-		# p3 = firsthalf[math.ceil(ran/2)]
-		# p4 = secondhalf[math.ceil(rand/2)]
-
-		# programreproduce(firsthalf, p1, p2)
-		# programreproduce(secondhalf, p3, p4)
 
 		programreproduce(programarr, p1, p2)
-		# newarr.extend(secondhalf)
-		# newarr.extend(secondhalf)
-		# programarr = newarr
 
-def createImage(code):
+# make a cfa image
+def createImage(code, codeName, resultName):
 	if (not os.path.exists("output")):
 		os.mkdir("output")
 
-	with open("output/code.cfdg", "w") as fout:
+	with open("output/" + codeName + ".cfdg", "w") as fout:
 		fout.write(code)
 
-	subprocess.run(["ContextFree/ContextFreeCLI.exe", "output/code.cfdg", "output/result.png"])
+	subprocess.run(["ContextFree/ContextFreeCLI.exe", "output/" + codeName + ".cfdg", "output/" + resultName + ".png"])
 

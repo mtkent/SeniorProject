@@ -1,0 +1,22 @@
+
+		startshape sun
+		CF::MinimumSize = 0.1
+		shape sun
+rule 1{
+cord []
+sun [x 1.0201 r 60 h 2.9699999999999998 sat -0.19 s 0.98901 b 0.099] 
+ } 
+
+shape cord
+rule 1{
+CIRCLE [sat 1 h 270]
+cord [y 1 r 60.1 s 0.98] 
+ } 
+
+shape sun
+rule 1{
+cord []
+sun [x 1.0201 r 60 h 2.9699999999999998 sat -0.19 s 0.98901 b 0.099] 
+ } 
+
+		

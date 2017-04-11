@@ -1,8 +1,13 @@
+# testing.py: where all testing and program creation happens
+
 # imports
 import classes
 from classes import Triangle, Size, Square, Circle, Skew, Alpha, Brightness, Saturation, Hue, Y, Z, Rotate, Flip, X, Transform, ShapeDef, NonTerminal, Shape, Program, RuleCall, randRange
 import functions
 from functions import newprogram, createImage, programbreed, programreproduce, scramblenames, crossParams, fitness, avgFitness
+
+
+#  -------------------------- parent definition here ----------------------------------
 
 # starter parents
 parent1 = Triangle([Skew(20, 30), Brightness(.5)] ) #, Hue(41312), Y(100)) 
@@ -38,17 +43,8 @@ parent5 = ShapeDef(None, [
 
 nt5.addShapeDef(parent5)
 
-# parent4 = ShapeDef(None, [
-# 	Triangle([Y (10)]), 
-# 	Triangle([Y (5)]), 
-# 	Triangle([Y (0)]), 
-# 	])
-# nt4 = NonTerminal("nt4", parent4)  # <- adding another parent just adds it to it as a rule
 
-# parent4 = ShapeDef(None, [
-# 	Triangle(Skew (10, 12)), 
-# 	Triangle(Skew (5, 40)), 
-# 	Triangle(Skew (0, 11)) ])
+# first recursive parent
 blahargs = [
 	Triangle ([]), 
 	]
@@ -83,9 +79,26 @@ program7 = Program ("blah", [nt6, blah2])
 
 nt6.setProgram(program7)
 
+# nonterminals from more complicated parents
+nt3 = NonTerminal("nt3", [parent3])
+# nt4 = NonTerminal("nt4", parent4)  # <- adding another parent just adds it to it as a rule
+# nt41 = NonTerminal("nt41", parent4)
+nt5 = NonTerminal("nt5", [parent5])
+# nt6 = NonTerminal("nt6", blah2)
+# nt7 = NonTerminal("nt7", blah)
+
+# programs from nonterminals
+program1 = Program("nt3", [nt3])
+program2 = Program("nt4",[nt4, nt5])
+program3 = Program("nt5",[nt5, nt4.__copy__()])
+
+# need to set parents after 
+nt3.setProgram(program1)
+nt4.setProgram(program2)
+nt5.setProgram(program3)
 
 
-# https://contextfreeart.org/gallery/view.php?id=3807
+# tendris parent: https://contextfreeart.org/gallery/view.php?id=3807
 
 armArgs1 = [
 	Circle ([]), 
@@ -124,27 +137,8 @@ tendris.setProgram(online1)
 arm.setProgram(online1)
 
 
-# nonterminals from more complicated parents
-nt3 = NonTerminal("nt3", [parent3])
-# nt4 = NonTerminal("nt4", parent4)  # <- adding another parent just adds it to it as a rule
-# nt41 = NonTerminal("nt41", parent4)
-nt5 = NonTerminal("nt5", [parent5])
-# nt6 = NonTerminal("nt6", blah2)
-# nt7 = NonTerminal("nt7", blah)
 
-# programs from nonterminals
-program1 = Program("nt3", [nt3])
-program2 = Program("nt4",[nt4, nt5])
-program3 = Program("nt5",[nt5, nt4.__copy__()])
-
-# need to set parents after 
-nt3.setProgram(program1)
-nt4.setProgram(program2)
-nt5.setProgram(program3)
-
-
-
-# https://contextfreeart.org/gallery/view.php?id=122
+# flower parent: https://contextfreeart.org/gallery/view.php?id=122
 cs1args = [
 	Square([])
 ]
@@ -193,29 +187,8 @@ flower.setProgram(online2)
 start.setProgram(online2)
 
 
-# currently not able to code because we don't have multiplication of a rule implemented 
-# # https://contextfreeart.org/gallery/view.php?id=2489
 
-# chaosShapeArgs = [
-# 	Circle([Hue random.range(0, 365)])
-# ]
-# chaosShape = ShapeDef(None, [chaosShapeArgs])
-
-# chaosShapeArgs.append(
-# 	RuleCall
-# 	)
- 
-# 100 * { r rand_static(0, 360)  s .89 h 4 sat .018  b .08}  chaos{ y 1 s.5  r
-# (rand_static(0, 360)) f 90}
- 
-
-# chaos = NonTerminal("chaos", [chaosShape])
-
-# online3 = Program("chaos", [chaos])
-# chaos.setProgram(online3)
-
-
-# https://contextfreeart.org/gallery/view.php?id=185
+# map parent: https://contextfreeart.org/gallery/view.php?id=185
 
 
 wsArg1 = []
@@ -252,10 +225,8 @@ ancientmap.setProgram(online4)
 wall.setProgram(online4)
 
 
-# https://contextfreeart.org/gallery/view.php?id=1974           -- to do?
 
-
-# https://contextfreeart.org/gallery/view.php?id=1872
+# sun parent: https://contextfreeart.org/gallery/view.php?id=1872
 sunShapeArgs = []
 cordShapeArgs = [
 	Circle([Saturation (1), Hue (270)])
@@ -276,40 +247,32 @@ online5 = Program ("sun", [sun, cord])
 sun.setProgram(online5)
 cord.setProgram(online5)
 
+#  ----------------------- testing happens here ---------------------------------------
 
-# # # # # a single program
-# aProgram = newprogram(online1, online4)
-# # # # print("P1 HERE", str(program1))
-# # # # print("P3 HERE", str(program3))
+# creates number of shapes
+for i in range (9):
 
-# print(str(aProgram))
-# print("my fitness: ", fitness(aProgram))
-# createImage(str(aProgram))
+	# a single program generation
 
+	# aProgram = newprogram(online1, online5)              # pick parents here
 
-
-# # for breeding/reproducing
-programarr = [None] * 100
-
-programreproduce(programarr, online1, online4)
-programbreed(programarr, 10)
-
-
-createImage(str(programarr[0]))
-print(str(programarr[0]))
-print(avgFitness(programarr), "AVG FITNESS")
-print(fitness(programarr[0]), "THIS FITNESS")
+	# print(str(aProgram))                       # see the progarm text
+	# print("my fitness: ", fitness(aProgram))   # testing fitness
+	# createImage(str(aProgram), ("code" + str(i)), ("result" + str(i)))
 
 
 
+	# array for breeding/reproducing 
+	programarr = [None] * 100
 
+	programreproduce(programarr, online5, online2)             # pick parents here
+	# currently only doing one generation, can increase second param to however many generations wanted
+	programbreed(programarr, 0)
 
-# print("program 2: ", str(programarr[1]))
+	# name result correctly 
+	createImage(str(programarr[0]), ("code" + str(i)), ("result" + str(i)))
 
-# print("new program: ", str(newprogram(program1, program2)))
-
-# scramblenames(program3.shapes)
-# print(str(program3))
-
-# createImage(str(online5))
-# print(str(online5))
+	# print the text, fitness
+	print(str(programarr[0]))
+	print(avgFitness(programarr), "AVG FITNESS")
+	print(fitness(programarr[0]), "THIS FITNESS")

@@ -1,0 +1,48 @@
+
+		startshape ancientmap
+		CF::MinimumSize = 0.1
+		shape ancientmap
+rule 1{
+cord []
+sun [x 1 r 60 h 3 sat -0.19 s 0.999 b 0.1] 
+ } 
+
+rule 1{
+cord []
+wall [y 0.9797 r -90 s 1.5] 
+ } 
+
+shape cord
+rule 1{
+CIRCLE [sat 1 h 270]
+cord [y 1 r 60.1 s 0.98] 
+ } 
+
+shape sun
+rule 1{
+cord []
+sun [x 1 r 60 h 3 sat -0.19 s 0.999 b 0.1] 
+ } 
+
+shape wall
+rule 1{
+wall [y 0.95 r 1 s 0.975] 
+ } 
+
+rule 1{
+SQUARE []
+wall [y 0.95 r -1 s 0.975 sat 0.1 b 0.01 h 0.1] 
+ } 
+
+rule 0.09{
+SQUARE []
+wall [y 0.95 r 90 s 0.975]
+wall [y 0.95 r -90 s 0.975] 
+ } 
+
+rule 0.005{
+wall [y 0.97 r 90 s 1.5]
+wall [y 0.9797 r -90 s 1.5] 
+ } 
+
+		

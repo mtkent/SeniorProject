@@ -1,0 +1,27 @@
+startshape tendris 
+
+shape tendris 
+    rule 1 {
+        arm [h 348.16 sat 0.7039 b 1.0000 ]
+        arm[ flip 90 h 282.99 sat 0.7412 b 1.0000]
+    }
+
+shape arm 
+    rule 98 {
+        CIRCLE  [ ]
+        CIRCLE [ size 0.9 brightness 1 ]
+        arm[ y 0.2 size 0.99 rotate 3 ]
+    }
+ 
+    rule 2 {
+        CIRCLE [ ]
+        CIRCLE [ size 0.9 brightness 1 ]
+        arm [ y 0.2 size 0.99 flip 90 ]
+        arm [ y 0.2 size 0.6 brightness 0.2 ]
+    }
+
+
+
+
+
+
