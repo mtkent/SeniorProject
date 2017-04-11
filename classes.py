@@ -1,3 +1,4 @@
+# Marina Kent, senior project 4/21/17
 # classes.py: contains all class definitions for program
 
 class Program: # has startshape, which shapeDef, and a dictionary of nodes
